@@ -1,71 +1,82 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { fallbackArticles } from "./data/fallbackArticles";
 
-function App() {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+
+export default function App() {
   const [articles, setArticles] = useState([]);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
   const [usingFallback, setUsingFallback] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const theme = darkMode ? darkTheme : lightTheme;
 
-  useEffect(() => {
-    async function loadArticles() {
-      try {
-        if (!API_BASE_URL) throw new Error("API not configured");
+  const fetchArticles = useCallback(async () => {
+    setLoading(true);
 
-        const res = await fetch(`${API_BASE_URL}/api/articles`);
-        if (!res.ok) throw new Error("Backend unreachable");
-
-        const data = await res.json();
-        if (!Array.isArray(data) || data.length === 0) {
-          throw new Error("Empty API response");
-        }
-
-        setArticles(data);
-        setSelectedArticle(data[0]);
-        setUsingFallback(false);
-      } catch (err) {
-        console.warn("Demo mode enabled:", err.message);
-        setArticles(fallbackArticles);
-        setSelectedArticle(fallbackArticles[0]);
-        setUsingFallback(true);
-      } finally {
-        setLoading(false);
-      }
+    if (!API_BASE_URL) {
+      setArticles(fallbackArticles);
+      setSelectedArticle(fallbackArticles[0]);
+      setUsingFallback(true);
+      setLoading(false);
+      return;
     }
 
-    loadArticles();
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/articles`);
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      setArticles(data);
+      setSelectedArticle(data[0]);
+      setUsingFallback(false);
+    } catch {
+      setArticles(fallbackArticles);
+      setSelectedArticle(fallbackArticles[0]);
+      setUsingFallback(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const theme = darkMode ? darkTheme : lightTheme;
+  useEffect(() => {
+    fetchArticles();
+  }, [fetchArticles]);
 
   return (
     <div
       style={{
-        ...styles.app,
+        minHeight: "100vh",
         background: theme.pageBg,
-        color: theme.textPrimary,
+        color: theme.text,
       }}
     >
       {/* HEADER */}
-      <header style={{ ...styles.header, background: theme.headerBg }}>
+      <header
+        style={{
+          background: theme.headerBg,
+          color: theme.headerText,
+          padding: "14px 20px",
+          position: "sticky",
+          top: 0,
+          zIndex: 10,
+        }}
+      >
         <div style={styles.headerInner}>
-          <strong>BeyondChats</strong>
+          <strong style={{ fontSize: 20 }}>BeyondChats</strong>
 
-          <div style={styles.headerRight}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             {usingFallback && (
               <span style={styles.demoBadge}>
-                Demo Mode · Backend API not deployed
+                Demo Mode · Backend not deployed
               </span>
             )}
 
             <button
               onClick={() => setDarkMode(!darkMode)}
-              style={{ ...styles.themeToggle, borderColor: theme.borderColor }}
+              style={styles.iconButton}
             >
-              {darkMode ? "☀️" : "🌙"}
+              {darkMode ? "☀" : "🌙"}
             </button>
           </div>
         </div>
@@ -73,204 +84,207 @@ function App() {
 
       {/* MAIN */}
       <main style={styles.main}>
-        <div style={{ ...styles.card, background: theme.surfaceBg }}>
-          {/* SIDEBAR */}
-          <aside style={styles.sidebar}>
-            <h4 style={{ color: theme.textSecondary }}>Articles</h4>
-            <small style={{ color: theme.textTertiary }}>
-              {articles.length} total
-            </small>
+        <div style={{ ...styles.card, background: theme.surface }}>
+          <div style={styles.layout}>
+            {/* SIDEBAR */}
+            <aside style={styles.sidebar}>
+              <h4 style={{ marginBottom: 8 }}>Articles</h4>
+              <small style={{ opacity: 0.7 }}>{articles.length} total</small>
 
-            <div style={styles.articleList}>
-              {loading ? (
-                <p>Loading…</p>
-              ) : (
-                articles.map((a) => {
-                  const active = selectedArticle?.id === a.id;
-                  return (
+              <div style={{ marginTop: 16 }}>
+                {loading ? (
+                  <div>Loading…</div>
+                ) : (
+                  articles.map((a) => (
                     <div
                       key={a.id}
                       onClick={() => setSelectedArticle(a)}
                       style={{
                         ...styles.articleItem,
-                        background: active ? theme.activeBg : "transparent",
-                        borderLeft: active
-                          ? `3px solid ${theme.accent}`
-                          : "3px solid transparent",
+                        background:
+                          selectedArticle?.id === a.id
+                            ? theme.activeBg
+                            : "transparent",
+                        borderLeft:
+                          selectedArticle?.id === a.id
+                            ? `3px solid ${theme.accent}`
+                            : "3px solid transparent",
                       }}
                     >
                       {a.title}
-                      {usingFallback && (
-                        <div style={styles.demoLabel}>Demo article</div>
-                      )}
                     </div>
-                  );
-                })
+                  ))
+                )}
+              </div>
+            </aside>
+
+            {/* ARTICLE */}
+            <section style={styles.content}>
+              {selectedArticle && (
+                <>
+                  <h1 style={styles.title}>{selectedArticle.title}</h1>
+
+                  <span
+                    style={{
+                      ...styles.badge,
+                      background: theme.badgeBg,
+                      color: theme.badgeText,
+                    }}
+                  >
+                    {selectedArticle.is_updated
+                      ? "AI Enhanced"
+                      : "Source Article"}
+                  </span>
+
+                  <p style={styles.bodyText}>{selectedArticle.content}</p>
+
+                  <div style={styles.sourceBox}>
+                    <span style={{ color: theme.sourceLabel }}>Source:</span>
+                    <a
+                      href={selectedArticle.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ color: theme.link }}
+                    >
+                      {selectedArticle.source_url}
+                    </a>
+                  </div>
+                </>
               )}
-            </div>
-          </aside>
-
-          {/* CONTENT */}
-          <section style={styles.content}>
-            {selectedArticle && (
-              <>
-                <h1 style={styles.title}>{selectedArticle.title}</h1>
-
-                <span style={styles.badge}>
-                  {selectedArticle.is_updated
-                    ? "AI Enhanced"
-                    : "Source Article"}
-                </span>
-
-                <p style={styles.body}>{selectedArticle.content}</p>
-
-                <a
-                  href={selectedArticle.source_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ color: theme.link }}
-                >
-                  View original source →
-                </a>
-              </>
-            )}
-          </section>
+            </section>
+          </div>
         </div>
       </main>
 
       {/* FOOTER */}
-      <footer style={{ ...styles.footer, background: theme.footerBg }}>
+      <footer
+        style={{
+          textAlign: "center",
+          padding: "16px",
+          color: theme.footerText,
+        }}
+      >
         © 2025 BeyondChats · Assignment Submission
       </footer>
     </div>
   );
 }
 
-/* ================== STYLES ================== */
+/* ---------------- THEMES ---------------- */
+
+const lightTheme = {
+  pageBg: "#f3f7fb",
+  surface: "#ffffff",
+  headerBg: "#0b3350",
+  headerText: "#ffffff",
+  text: "#0f172a",
+  activeBg: "#eef2ff",
+  accent: "#2563eb",
+  badgeBg: "#e0e7ff",
+  badgeText: "#1e40af",
+  sourceLabel: "#374151",
+  link: "#2563eb",
+  footerText: "#475569",
+};
+
+const darkTheme = {
+  pageBg: "#0a0a0a",
+  surface: "#0f1113",
+  headerBg: "#0c1720",
+  headerText: "#ffffff",
+  text: "#f8fafc",
+  activeBg: "#111827",
+  accent: "#60a5fa",
+  badgeBg: "#1e293b",
+  badgeText: "#93c5fd",
+  sourceLabel: "#9ca3af",
+  link: "#60a5fa",
+  footerText: "#9ca3af",
+};
+
+/* ---------------- STYLES ---------------- */
 
 const styles = {
-  app: { minHeight: "100vh", display: "flex", flexDirection: "column" },
-
-  header: { position: "sticky", top: 0, zIndex: 10 },
   headerInner: {
-    maxWidth: "1200px",
+    maxWidth: 1280,
     margin: "0 auto",
-    padding: "16px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
   },
 
-  headerRight: { display: "flex", gap: "12px", alignItems: "center" },
-
-  demoBadge: {
-    fontSize: "11px",
-    background: "#374151",
-    padding: "4px 10px",
-    borderRadius: "999px",
-  },
-
-  themeToggle: {
-    background: "transparent",
-    border: "1px solid",
-    borderRadius: "6px",
-    padding: "6px",
-    cursor: "pointer",
-  },
-
   main: {
-    flex: 1,
-    padding: "clamp(16px, 4vw, 40px)",
+    padding: "clamp(16px, 4vw, 32px)",
   },
 
   card: {
-    maxWidth: "1200px",
+    maxWidth: 1280,
     margin: "0 auto",
-    display: "grid",
-    gridTemplateColumns: "minmax(200px, 300px) 1fr",
-    gap: "32px",
-    padding: "clamp(16px, 4vw, 40px)",
-    borderRadius: "14px",
+    borderRadius: 14,
+    padding: "clamp(16px, 3vw, 28px)",
   },
 
-  sidebar: { minWidth: 0 },
-  articleList: {
-    marginTop: "16px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "6px",
+  layout: {
+    display: "grid",
+    gridTemplateColumns: "260px 1fr",
+    gap: 32,
+  },
+
+  sidebar: {
+    fontSize: 14,
   },
 
   articleItem: {
     padding: "10px 12px",
-    borderRadius: "8px",
+    borderRadius: 8,
     cursor: "pointer",
-    fontSize: "14px",
+    marginBottom: 6,
   },
 
-  demoLabel: {
-    fontSize: "11px",
-    opacity: 0.6,
+  content: {
+    minWidth: 0,
   },
-
-  content: { minWidth: 0 },
 
   title: {
-    fontSize: "clamp(24px, 4vw, 42px)",
-    lineHeight: 1.2,
-    marginBottom: "12px",
+    fontSize: "clamp(26px, 4vw, 42px)",
+    lineHeight: 1.1,
   },
 
   badge: {
     display: "inline-block",
-    fontSize: "12px",
-    padding: "4px 12px",
-    borderRadius: "999px",
-    background: "#e5e7eb",
-    marginBottom: "24px",
+    marginTop: 8,
+    padding: "6px 12px",
+    borderRadius: 999,
+    fontSize: 12,
   },
 
-  body: {
-    fontSize: "clamp(15px, 1.4vw, 18px)",
-    lineHeight: 1.7,
-    marginBottom: "24px",
+  bodyText: {
+    marginTop: 20,
+    lineHeight: 1.8,
+    fontSize: 17,
   },
 
-  footer: {
-    padding: "16px",
-    textAlign: "center",
-    fontSize: "13px",
+  sourceBox: {
+    marginTop: 24,
+    display: "flex",
+    gap: 8,
+    flexWrap: "wrap",
+    fontSize: 14,
+  },
+
+  demoBadge: {
+    background: "#374151",
+    color: "#e5e7eb",
+    padding: "6px 10px",
+    borderRadius: 999,
+    fontSize: 12,
+  },
+
+  iconButton: {
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    fontSize: 18,
+    color: "inherit",
   },
 };
-
-/* ================== THEMES ================== */
-
-const lightTheme = {
-  pageBg: "#eef2f7",
-  surfaceBg: "#ffffff",
-  headerBg: "#0c2340",
-  footerBg: "#0c2340",
-  textPrimary: "#111827",
-  textSecondary: "#4b5563",
-  textTertiary: "#9ca3af",
-  borderColor: "#e5e7eb",
-  accent: "#2563eb",
-  link: "#2563eb",
-  activeBg: "#f3f4f6",
-};
-
-const darkTheme = {
-  pageBg: "#0a0a0a",
-  surfaceBg: "#121212",
-  headerBg: "#18181b",
-  footerBg: "#18181b",
-  textPrimary: "#f4f4f5",
-  textSecondary: "#a1a1aa",
-  textTertiary: "#71717a",
-  borderColor: "#27272a",
-  accent: "#60a5fa",
-  link: "#60a5fa",
-  activeBg: "#18181b",
-};
-
-export default App;
