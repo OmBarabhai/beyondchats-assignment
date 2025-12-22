@@ -2,25 +2,25 @@
 
 This repository contains my submission for the **BeyondChats Full Stack Engineer / Technical Product Manager** assignment.
 
-The goal of this assignment was **not perfect completeness**, but to demonstrate how I approach real-world problems under constraints - including **system design, trade-offs, prioritization, and execution clarity**.
-
-I focused on building a **reliable end-to-end system**, documenting conscious decisions, and avoiding over-engineering where it didn’t add value.
+The goal of this assignment was to demonstrate **real-world engineering judgment** — including system design, trade-offs, deployment awareness, and clean execution — rather than only maximizing feature count.
 
 ---
 
-## 🧠 Tech Stack
+## 🔧 Tech Stack
 
 ### Backend
 
-- Laravel (PHP 8.2)
+- **Laravel (PHP 8.2)**
 - SQLite (local development)
-- Symfony HTTP Client + DomCrawler (scraping)
+- Symfony HTTP Client + DomCrawler
+- RESTful APIs
 
 ### Frontend
 
-- ReactJS (Vite)
-- Custom CSS
-- Dark / Light mode support
+- **React (Vite)**
+- Custom CSS (no UI frameworks)
+- Dark / Light mode
+- Responsive, zoom-safe UI
 
 ### Planned / Design-Level
 
@@ -29,7 +29,7 @@ I focused on building a **reliable end-to-end system**, documenting conscious de
 
 ---
 
-## 🏗️ High-Level Architecture
+## 🧱 High-Level Architecture
 
 ```
 BeyondChats Blog
@@ -40,10 +40,10 @@ Articles Database
         ↓
 REST APIs
         ↓
-React Frontend
+React Dashboard
 ```
 
-This architecture mirrors a **real internal content pipeline**, separating ingestion, storage, transformation, and presentation.
+This mirrors a realistic **internal content pipeline** used in production systems.
 
 ---
 
@@ -51,16 +51,12 @@ This architecture mirrors a **real internal content pipeline**, separating inges
 
 ```
 beyondchats-assignment/
-├── backend-laravel/
-├── frontend-react/
-├── node-llm-pipeline/
+├── backend-laravel/        # Scraping + CRUD APIs
+├── frontend-react/         # React dashboard (deployed)
+├── node-llm-pipeline/      # Phase 2 architecture (LLM flow)
 │   └── README.md
 └── README.md
 ```
-
-- `backend-laravel` → Scraping + CRUD APIs
-- `frontend-react` → Article reader UI
-- `node-llm-pipeline` → Phase 2 design & flow documentation
 
 ---
 
@@ -77,8 +73,8 @@ php artisan migrate
 php artisan serve
 ```
 
-Backend runs at:
-**[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+Runs at:
+👉 **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
 
 ---
 
@@ -90,18 +86,49 @@ npm install
 npm run dev
 ```
 
-Frontend runs at:
-**[http://localhost:5173](http://localhost:5173)**
+Runs at:
+👉 **[http://localhost:5173](http://localhost:5173)**
+
+When running locally, the frontend automatically connects to the Laravel backend.
 
 ---
 
-## 🌐 Live Demo
+## 🌐 Live Deployment
 
-Frontend (Deployed):
-👉 **[Add your Vercel link here]**
+### Frontend (Vercel – Production)
 
-Backend:
-Runs locally via Laravel (setup above)
+👉 **[https://beyondchats-assignment-tawny.vercel.app](https://beyondchats-assignment-tawny.vercel.app)**
+
+### Backend
+
+- Runs locally
+- Not publicly deployed (explained below)
+
+---
+
+## 🖼️ Screenshots (Application Preview)
+
+### Light Mode – Local Backend Connected
+
+![Light Mode – Backend Running](img/DeployLightLoc3.png)
+
+---
+
+### Dark Mode – Local Backend Connected
+
+![Dark Mode – Backend Running](img/DeployDarkLoc2.png)
+
+---
+
+### Production (Vercel) – Demo Mode
+
+![Demo Mode – Backend Not Deployed](img/DeployDemo1.png)
+
+---
+
+### Source Attribution & Navigation
+
+![Source Link & Navigation](img/DeploylinkClick4.png)
 
 ---
 
@@ -111,27 +138,22 @@ Runs locally via Laravel (setup above)
 
 - Scrape the **5 oldest articles** from BeyondChats blogs
 - Store them in a database
-- Expose full CRUD APIs via Laravel
+- Expose CRUD APIs using Laravel
+- Consume APIs in React frontend
 
 ---
 
 ### Pagination & Scraping Strategy
 
-To reliably fetch the **oldest articles**, the pagination structure of
-[https://beyondchats.com/blogs/](https://beyondchats.com/blogs/) was analyzed.
+To reliably fetch the oldest articles from
+[https://beyondchats.com/blogs/](https://beyondchats.com/blogs/) :
 
-**Chosen approach:**
-
-1. Load the blog listing page
+1. Load blog listing page
 2. Detect pagination links
 3. Identify the **last page**
 4. Scrape articles from that page
 
-This ensures deterministic behavior without fragile assumptions.
-
-> **Trade-off:**
-> Instead of iterating through all pages, the scraper directly targets the last page.
-> This improves reliability and reduces unnecessary requests - an intentional decision under time constraints.
+This ensures **deterministic and stable scraping**, avoiding fragile page-by-page crawling.
 
 ---
 
@@ -156,43 +178,39 @@ PUT    /api/articles/{id}
 DELETE /api/articles/{id}
 ```
 
-These APIs are consumed directly by the React frontend.
-
 ---
 
-### Known Limitation (Intentional)
+## ⚠️ Demo Mode vs Backend Deployment (Important)
 
-The article body currently stores **preview-level content** from the listing page.
+### Why the deployed site shows **“Demo Mode – Backend not deployed”**
 
-**Reason:**
+- Laravel requires a **persistent server runtime**
+- Vercel is optimized for **static frontends**
+- Proper Laravel deployment requires:
 
-- Blog pages use inconsistent DOM structures
-- Production-grade scraping typically requires:
+  - AWS / EC2 / Elastic Beanstalk / Docker
+  - Database provisioning
+  - Environment hardening
 
-  - Template-based parsing, or
-  - Readability / NLP-based extraction
+### Engineering Decision
 
-> Given the assignment scope, I prioritized **end-to-end system reliability** over aggressive scraping.
+Instead of deploying an unstable backend:
 
----
+- Frontend detects backend availability
+- If backend is unavailable:
 
-## 🤖 Phase 2 – LLM-Based Article Enhancement (Design-Level)
+  - UI switches to **fallback demo data**
+  - Banner clearly indicates **Demo Mode**
 
-Phase 2 is implemented as a **system design and flow**, not full execution.
+- If backend is running locally:
 
-### Intended Flow
+  - Same UI consumes **real APIs**
 
-1. Fetch latest article from Laravel API
-2. Search Google for high-ranking related articles
-3. Scrape external article content
-4. Use an LLM to rewrite/improve the original article
-5. Publish updated content via Laravel API with citations
+This demonstrates:
 
-This design is documented in:
-📄 `node-llm-pipeline/README.md`
-
-> **Trade-off:**
-> Full execution was skipped due to external API dependencies and time constraints, which aligns with the assignment’s expectations for partial completion.
+- Environment awareness
+- Graceful degradation
+- Production-minded frontend design
 
 ---
 
@@ -200,44 +218,63 @@ This design is documented in:
 
 ### Features
 
-- Sidebar-based article navigation
+- Sidebar article navigation
 - Article reader view
 - Dark / Light mode toggle
-- Source article attribution
-- Responsive, production-style layout
+- Source attribution links
+- Responsive layout
+- Zoom-safe typography and spacing
+- Clear demo/live backend indicator
 
-### Design Philosophy
+### UI Philosophy
 
-- Content-first UI
+- Content-first
+- Clean SaaS dashboard feel
 - Minimal distractions
-- Internal-tool / CMS-style experience
-- Clear hierarchy and readability
+- Professional internal-tool aesthetics
+
+---
+
+## 🤖 Phase 2 – LLM-Based Article Enhancement (Design-Level)
+
+Implemented as **architecture and flow documentation**.
+
+### Intended Flow
+
+1. Fetch article from Laravel API
+2. Search Google for related high-ranking articles
+3. Scrape competitor content
+4. Use LLM to rewrite/enhance article
+5. Publish updated article with citations
+
+Documented in:
+📄 `node-llm-pipeline/README.md`
 
 ---
 
 ## 🎯 Engineering Trade-offs
 
-- Prioritized **clarity and reliability** over completeness
-- Focused on **end-to-end flow**, not isolated features
-- Implemented Phase 2 as a design skeleton intentionally
-- Avoided unnecessary infrastructure complexity
-- Chose simplicity where it improved maintainability
+- Prioritized reliability over aggressive scraping
+- Avoided rushed backend deployment
+- Focused on end-to-end flow
+- Documented limitations transparently
+- Built with real-world constraints in mind
 
 ---
 
 ## 🏁 Final Notes
 
-This submission reflects how I approach real-world engineering problems:
+This submission reflects how I approach production systems:
 
 - Understand constraints
 - Make intentional trade-offs
-- Deliver a working system
-- Document limitations honestly
+- Build clean, reliable flows
+- Communicate decisions clearly
 
-Partial completion was **intentional** and aligned with the assignment guidelines.
+Partial completion is **intentional and documented**, aligned with the assignment guidelines.
 
 ---
 
-**- Om Barabhai**
+**— Om Barabhai**
 
 ---
