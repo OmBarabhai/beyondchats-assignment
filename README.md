@@ -2,7 +2,7 @@
 
 This repository contains my submission for the **BeyondChats Full Stack Engineer / Technical Product Manager** assignment.
 
-The goal of this assignment was to demonstrate **real-world engineering judgment** — including system design, trade-offs, deployment awareness, and clean execution — rather than only maximizing feature count.
+The goal of this assignment was to demonstrate **real-world engineering judgment** - including system design, trade-offs, deployment awareness, and clean execution - rather than only maximizing feature count.
 
 ---
 
@@ -275,6 +275,6 @@ Partial completion is **intentional and documented**, aligned with the assignmen
 
 ---
 
-**— Om Barabhai**
+**- Om Barabhai**
 
 ---
