@@ -30,11 +30,9 @@ function App() {
         }}
       >
         <div style={styles.headerContainer}>
-          <div style={styles.logo}>
-            <span style={{ ...styles.logoText, color: theme.headerText }}>
-              BeyondChats
-            </span>
-          </div>
+          <span style={{ ...styles.logoText, color: theme.headerText }}>
+            BeyondChats
+          </span>
 
           <div style={styles.headerRight}>
             <span style={{ ...styles.navItem, color: theme.headerText }}>Articles</span>
@@ -63,7 +61,7 @@ function App() {
           }}
         >
           {/* SIDEBAR */}
-          <aside style={styles.sidebar}>
+          <aside>
             <h4 style={{ ...styles.sidebarTitle, color: theme.textSecondary }}>
               Articles
             </h4>
@@ -102,9 +100,9 @@ function App() {
             </div>
           </aside>
 
-          {/* ARTICLE */}
+          {/* ARTICLE VIEW */}
           <section style={styles.articleArea}>
-            {selectedArticle ? (
+            {selectedArticle && (
               <article style={styles.article}>
                 <div
                   style={{
@@ -121,13 +119,13 @@ function App() {
                       ...styles.badge,
                       backgroundColor: selectedArticle.is_updated
                         ? theme.aiBadgeBg
-                        : theme.originalBadgeBg,
+                        : theme.sourceBadgeBg,
                       color: selectedArticle.is_updated
                         ? theme.aiBadgeText
-                        : theme.originalBadgeText,
+                        : theme.sourceBadgeText,
                     }}
                   >
-                    {selectedArticle.is_updated ? "AI Enhanced" : "Original"}
+                    {selectedArticle.is_updated ? "AI Enhanced" : "Source Article"}
                   </span>
                 </div>
 
@@ -158,7 +156,7 @@ function App() {
                   </a>
                 </footer>
               </article>
-            ) : null}
+            )}
           </section>
         </div>
       </main>
@@ -204,8 +202,8 @@ const lightTheme = {
   activeBg: "#f3f4f6",
   aiBadgeBg: "#dbeafe",
   aiBadgeText: "#1e40af",
-  originalBadgeBg: "#f3f4f6",
-  originalBadgeText: "#6b7280",
+  sourceBadgeBg: "#f3f4f6",
+  sourceBadgeText: "#6b7280",
   cardShadow: "0 12px 30px rgba(0,0,0,0.08)",
 };
 
@@ -226,8 +224,8 @@ const darkTheme = {
   activeBg: "#18181b",
   aiBadgeBg: "#1e3a5f",
   aiBadgeText: "#93c5fd",
-  originalBadgeBg: "#27272a",
-  originalBadgeText: "#a1a1aa",
+  sourceBadgeBg: "#27272a",
+  sourceBadgeText: "#a1a1aa",
   cardShadow: "0 12px 30px rgba(0,0,0,0.4)",
 };
 
@@ -257,10 +255,7 @@ const styles = {
     background: "transparent",
   },
 
-  mainWrapper: {
-    flex: 1,
-    padding: "48px 32px",
-  },
+  mainWrapper: { flex: 1, padding: "48px 32px" },
   contentGrid: {
     maxWidth: "1400px",
     margin: "0 auto",
@@ -290,12 +285,12 @@ const styles = {
     fontSize: "12px",
     padding: "4px 12px",
     borderRadius: "999px",
+    marginTop: "12px",
   },
   articleBody: { fontSize: "18px", lineHeight: 1.75 },
   paragraph: { marginBottom: "24px" },
   articleFooter: { marginTop: "48px", paddingTop: "24px" },
 
-  footer: {},
   footerInner: {
     maxWidth: "1400px",
     margin: "0 auto",
