@@ -1,20 +1,40 @@
 import { useEffect, useState } from "react";
+import { fallbackArticles } from "./data/fallbackArticles";
 
 function App() {
   const [articles, setArticles] = useState([]);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
+  const [usingFallback, setUsingFallback] = useState(false);
+
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/articles")
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchArticles = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/articles`);
+        if (!res.ok) throw new Error("Backend not reachable");
+
+        const data = await res.json();
+        if (!Array.isArray(data) || data.length === 0) {
+          throw new Error("Empty API response");
+        }
+
         setArticles(data);
-        setSelectedArticle(data[0] || null);
+        setSelectedArticle(data[0]);
+        setUsingFallback(false);
+      } catch (err) {
+        console.warn("Using fallback data:", err.message);
+        setArticles(fallbackArticles);
+        setSelectedArticle(fallbackArticles[0]);
+        setUsingFallback(true);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+
+    fetchArticles();
   }, []);
 
   const theme = darkMode ? darkTheme : lightTheme;
@@ -35,8 +55,16 @@ function App() {
           </span>
 
           <div style={styles.headerRight}>
-            <span style={{ ...styles.navItem, color: theme.headerText }}>Articles</span>
-            <span style={{ ...styles.navItem, color: theme.headerText }}>Resources</span>
+            <span style={{ ...styles.navItem, color: theme.headerText }}>
+              Articles
+            </span>
+
+            {usingFallback && (
+              <span style={styles.demoBadge}>
+                Demo Mode · Backend running locally
+              </span>
+            )}
+
             <button
               onClick={() => setDarkMode(!darkMode)}
               style={{
@@ -65,6 +93,7 @@ function App() {
             <h4 style={{ ...styles.sidebarTitle, color: theme.textSecondary }}>
               Articles
             </h4>
+
             <span style={{ ...styles.sidebarCount, color: theme.textTertiary }}>
               {articles.length} total
             </span>
@@ -93,6 +122,12 @@ function App() {
                       <span style={{ color: theme.textPrimary }}>
                         {article.title}
                       </span>
+
+                      {usingFallback && (
+                        <div style={styles.metaText}>
+                          Demo article
+                        </div>
+                      )}
                     </div>
                   );
                 })
@@ -130,13 +165,11 @@ function App() {
                 </div>
 
                 <div style={{ ...styles.articleBody, color: theme.textBody }}>
-                  {selectedArticle.content
-                    .split("\n\n")
-                    .map((p, i) => (
-                      <p key={i} style={styles.paragraph}>
-                        {p}
-                      </p>
-                    ))}
+                  {selectedArticle.content.split("\n\n").map((p, i) => (
+                    <p key={i} style={styles.paragraph}>
+                      {p}
+                    </p>
+                  ))}
                 </div>
 
                 <footer
@@ -171,18 +204,59 @@ function App() {
       >
         <div style={styles.footerInner}>
           <span style={{ color: theme.footerText }}>
-            © 2025 BeyondChats. Built for assignment.
+            © 2025 BeyondChats · Assignment Submission
           </span>
-          <div style={styles.footerLinks}>
-            <span>Privacy</span>
-            <span>Terms</span>
-          </div>
         </div>
       </footer>
     </div>
   );
 }
 
+/* ===== SMALL BUT CRITICAL STYLE FIXES ===== */
+
+const styles = {
+  app: { minHeight: "100vh", display: "flex", flexDirection: "column" },
+
+  header: { position: "sticky", top: 0, zIndex: 10 },
+  headerContainer: {
+    maxWidth: "min(1400px, 100%)",
+    margin: "0 auto",
+    height: "64px",
+    padding: "0 clamp(16px, 4vw, 32px)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  demoBadge: {
+    fontSize: "11px",
+    padding: "4px 10px",
+    borderRadius: "999px",
+    background: "#374151",
+    color: "#9ca3af",
+  },
+
+  mainWrapper: {
+    flex: 1,
+    padding: "clamp(16px, 4vw, 48px)",
+  },
+
+  contentGrid: {
+    maxWidth: "min(1400px, 100%)",
+    margin: "0 auto",
+    padding: "clamp(20px, 4vw, 40px)",
+    display: "grid",
+    gridTemplateColumns: "minmax(220px, 320px) minmax(0,1fr)",
+    gap: "clamp(24px, 4vw, 56px)",
+    borderRadius: "14px",
+  },
+
+  metaText: {
+    fontSize: "11px",
+    opacity: 0.6,
+    marginTop: "4px",
+  },
+}
 /* THEMES */
 
 const lightTheme = {
@@ -230,76 +304,76 @@ const darkTheme = {
 };
 
 /* STYLES */
-
-const styles = {
-  app: { minHeight: "100vh", display: "flex", flexDirection: "column" },
-
-  header: { position: "sticky", top: 0, zIndex: 10 },
-  headerContainer: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    height: "64px",
-    padding: "0 32px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  logoText: { fontSize: "18px", fontWeight: 600 },
-  headerRight: { display: "flex", alignItems: "center", gap: "24px" },
-  navItem: { fontSize: "14px" },
-  themeToggle: {
-    width: "36px",
-    height: "36px",
-    borderRadius: "6px",
-    cursor: "pointer",
-    background: "transparent",
-  },
-
-  mainWrapper: { flex: 1, padding: "48px 32px" },
-  contentGrid: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    padding: "40px",
-    display: "grid",
-    gridTemplateColumns: "320px minmax(0,1fr)",
-    gap: "56px",
-    borderRadius: "14px",
-  },
-
-  sidebarTitle: { fontSize: "12px", letterSpacing: "0.1em" },
-  sidebarCount: { fontSize: "12px", marginBottom: "24px" },
-  articleList: { display: "flex", flexDirection: "column", gap: "6px" },
-  articleItem: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "14px",
-  },
-
-  articleArea: { minWidth: 0 },
-  article: { maxWidth: "760px" },
-  articleHeader: { paddingBottom: "32px", marginBottom: "32px" },
-  articleTitle: { fontSize: "38px", lineHeight: 1.15 },
-  badge: {
-    display: "inline-block",
-    fontSize: "12px",
-    padding: "4px 12px",
-    borderRadius: "999px",
-    marginTop: "12px",
-  },
-  articleBody: { fontSize: "18px", lineHeight: 1.75 },
-  paragraph: { marginBottom: "24px" },
-  articleFooter: { marginTop: "48px", paddingTop: "24px" },
-
-  footerInner: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    padding: "32px",
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: "13px",
-  },
-  footerLinks: { display: "flex", gap: "16px" },
-};
+// 
+// const styles = {
+  // app: { minHeight: "100vh", display: "flex", flexDirection: "column" },
+// 
+  // header: { position: "sticky", top: 0, zIndex: 10 },
+  // headerContainer: {
+    // maxWidth: "1400px",
+    // margin: "0 auto",
+    // height: "64px",
+    // padding: "0 32px",
+    // display: "flex",
+    // alignItems: "center",
+    // justifyContent: "space-between",
+  // },
+  // logoText: { fontSize: "18px", fontWeight: 600 },
+  // headerRight: { display: "flex", alignItems: "center", gap: "24px" },
+  // navItem: { fontSize: "14px" },
+  // themeToggle: {
+    // width: "36px",
+    // height: "36px",
+    // borderRadius: "6px",
+    // cursor: "pointer",
+    // background: "transparent",
+  // },
+// 
+  // mainWrapper: { flex: 1, padding: "48px 32px" },
+  // contentGrid: {
+    // maxWidth: "1400px",
+    // margin: "0 auto",
+    // padding: "40px",
+    // display: "grid",
+    // gridTemplateColumns: "320px minmax(0,1fr)",
+    // gap: "56px",
+    // borderRadius: "14px",
+  // },
+// 
+  // sidebarTitle: { fontSize: "12px", letterSpacing: "0.1em" },
+  // sidebarCount: { fontSize: "12px", marginBottom: "24px" },
+  // articleList: { display: "flex", flexDirection: "column", gap: "6px" },
+  // articleItem: {
+    // padding: "12px 16px",
+    // borderRadius: "8px",
+    // cursor: "pointer",
+    // fontSize: "14px",
+  // },
+// 
+  // articleArea: { minWidth: 0 },
+  // article: { maxWidth: "760px" },
+  // articleHeader: { paddingBottom: "32px", marginBottom: "32px" },
+  // articleTitle: { fontSize: "38px", lineHeight: 1.15 },
+  // badge: {
+    // display: "inline-block",
+    // fontSize: "12px",
+    // padding: "4px 12px",
+    // borderRadius: "999px",
+    // marginTop: "12px",
+  // },
+  // articleBody: { fontSize: "18px", lineHeight: 1.75 },
+  // paragraph: { marginBottom: "24px" },
+  // articleFooter: { marginTop: "48px", paddingTop: "24px" },
+// 
+  // footerInner: {
+    // maxWidth: "1400px",
+    // margin: "0 auto",
+    // padding: "32px",
+    // display: "flex",
+    // justifyContent: "space-between",
+    // fontSize: "13px",
+  // },
+  // footerLinks: { display: "flex", gap: "16px" },
+// };
 
 export default App;
