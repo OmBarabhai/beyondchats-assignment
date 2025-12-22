@@ -2,7 +2,7 @@
 
 This repository contains my submission for the **BeyondChats Full Stack Engineer / Technical Product Manager** assignment.
 
-The goal of this assignment was **not perfect completeness**, but to demonstrate how I approach real-world problems under constraints — including **system design, trade-offs, prioritization, and execution clarity**.
+The goal of this assignment was **not perfect completeness**, but to demonstrate how I approach real-world problems under constraints - including **system design, trade-offs, prioritization, and execution clarity**.
 
 I focused on building a **reliable end-to-end system**, documenting conscious decisions, and avoiding over-engineering where it didn’t add value.
 
@@ -12,20 +12,20 @@ I focused on building a **reliable end-to-end system**, documenting conscious de
 
 ### Backend
 
-* Laravel (PHP 8.2)
-* SQLite (local development)
-* Symfony HTTP Client + DomCrawler (scraping)
+- Laravel (PHP 8.2)
+- SQLite (local development)
+- Symfony HTTP Client + DomCrawler (scraping)
 
 ### Frontend
 
-* ReactJS (Vite)
-* Custom CSS
-* Dark / Light mode support
+- ReactJS (Vite)
+- Custom CSS
+- Dark / Light mode support
 
 ### Planned / Design-Level
 
-* Node.js
-* LLM APIs (OpenAI / Claude)
+- Node.js
+- LLM APIs (OpenAI / Claude)
 
 ---
 
@@ -58,9 +58,9 @@ beyondchats-assignment/
 └── README.md
 ```
 
-* `backend-laravel` → Scraping + CRUD APIs
-* `frontend-react` → Article reader UI
-* `node-llm-pipeline` → Phase 2 design & flow documentation
+- `backend-laravel` → Scraping + CRUD APIs
+- `frontend-react` → Article reader UI
+- `node-llm-pipeline` → Phase 2 design & flow documentation
 
 ---
 
@@ -109,9 +109,9 @@ Runs locally via Laravel (setup above)
 
 ### Objective
 
-* Scrape the **5 oldest articles** from BeyondChats blogs
-* Store them in a database
-* Expose full CRUD APIs via Laravel
+- Scrape the **5 oldest articles** from BeyondChats blogs
+- Store them in a database
+- Expose full CRUD APIs via Laravel
 
 ---
 
@@ -131,18 +131,18 @@ This ensures deterministic behavior without fragile assumptions.
 
 > **Trade-off:**
 > Instead of iterating through all pages, the scraper directly targets the last page.
-> This improves reliability and reduces unnecessary requests — an intentional decision under time constraints.
+> This improves reliability and reduces unnecessary requests - an intentional decision under time constraints.
 
 ---
 
 ### Stored Article Fields
 
-* `title`
-* `slug`
-* `content`
-* `source_url`
-* `is_updated`
-* timestamps
+- `title`
+- `slug`
+- `content`
+- `source_url`
+- `is_updated`
+- timestamps
 
 ---
 
@@ -166,11 +166,11 @@ The article body currently stores **preview-level content** from the listing pag
 
 **Reason:**
 
-* Blog pages use inconsistent DOM structures
-* Production-grade scraping typically requires:
+- Blog pages use inconsistent DOM structures
+- Production-grade scraping typically requires:
 
-  * Template-based parsing, or
-  * Readability / NLP-based extraction
+  - Template-based parsing, or
+  - Readability / NLP-based extraction
 
 > Given the assignment scope, I prioritized **end-to-end system reliability** over aggressive scraping.
 
@@ -200,28 +200,28 @@ This design is documented in:
 
 ### Features
 
-* Sidebar-based article navigation
-* Article reader view
-* Dark / Light mode toggle
-* Source article attribution
-* Responsive, production-style layout
+- Sidebar-based article navigation
+- Article reader view
+- Dark / Light mode toggle
+- Source article attribution
+- Responsive, production-style layout
 
 ### Design Philosophy
 
-* Content-first UI
-* Minimal distractions
-* Internal-tool / CMS-style experience
-* Clear hierarchy and readability
+- Content-first UI
+- Minimal distractions
+- Internal-tool / CMS-style experience
+- Clear hierarchy and readability
 
 ---
 
 ## 🎯 Engineering Trade-offs
 
-* Prioritized **clarity and reliability** over completeness
-* Focused on **end-to-end flow**, not isolated features
-* Implemented Phase 2 as a design skeleton intentionally
-* Avoided unnecessary infrastructure complexity
-* Chose simplicity where it improved maintainability
+- Prioritized **clarity and reliability** over completeness
+- Focused on **end-to-end flow**, not isolated features
+- Implemented Phase 2 as a design skeleton intentionally
+- Avoided unnecessary infrastructure complexity
+- Chose simplicity where it improved maintainability
 
 ---
 
@@ -229,15 +229,15 @@ This design is documented in:
 
 This submission reflects how I approach real-world engineering problems:
 
-* Understand constraints
-* Make intentional trade-offs
-* Deliver a working system
-* Document limitations honestly
+- Understand constraints
+- Make intentional trade-offs
+- Deliver a working system
+- Document limitations honestly
 
 Partial completion was **intentional** and aligned with the assignment guidelines.
 
 ---
 
-**— Om Barabhai**
+**- Om Barabhai**
 
 ---
