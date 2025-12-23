@@ -1,48 +1,52 @@
 // src/data/fallbackArticles.js
 
 export const fallbackArticles = [
+  
   {
     id: "demo-1",
-    title: "Can Chatbots Boost Small Business Growth?",
+    title: "Chatbots Magic: Beginner’s Guidebook",
     content:
-      "Small businesses often struggle with limited manpower and delayed customer responses. This article demonstrates how chatbots can automate lead qualification, customer support, and follow-ups, improving conversion rates even with small teams.",
-    source_url: "https://beyondchats.com/blogs/",
+      "This beginner-friendly guide explains what chatbots are, how they work, and how businesses can start using them effectively to improve customer engagement and automation.",
+    source_url:
+      "https://beyondchats.com/blogs/introduction-to-chatbots/",
     is_updated: false,
   },
   {
     id: "demo-2",
-    title: "10X Your Leads: How Chatbots Revolutionize Lead Generation",
+    title: "7 Ways a Live Chatbot Transforms Customer Interaction",
     content:
-      "Choosing the right AI chatbot can feel confusing. There are many platforms available, each promising better engagement and higher conversions. This demo article shows how backend-driven content is rendered reliably in the frontend.",
+      "Live chatbots help businesses respond instantly, guide users through decisions, and improve customer satisfaction. This article explains how conversational automation enhances engagement.",
     source_url:
-      "https://beyondchats.com/blogs/lead-generation-chatbots/",
+      "https://beyondchats.com/blogs/live-chatbot/",
     is_updated: false,
   },
   {
     id: "demo-3",
     title: "7 Clear Indicators Your Business Needs a Virtual Assistant",
     content:
-      "When repetitive tasks, delayed replies, and missed leads start affecting growth, it may be time to adopt a virtual assistant. This article explains common operational signals that indicate automation readiness.",
+      "When teams face repetitive work, delayed responses, and missed follow-ups, it may be time to adopt a virtual assistant. This article highlights common operational signals.",
     source_url:
       "https://beyondchats.com/blogs/virtual-assistant/",
     is_updated: false,
   },
   {
     id: "demo-4",
-    title: "7 Ways a Live Chatbot Transforms Customer Interaction",
+    title: "10X Your Leads: How Chatbots Revolutionize Lead Generation",
     content:
-      "Live chatbots improve customer experience by offering instant replies, guiding users in real time, and reducing support workload. This demo simulates how scraped articles are displayed consistently across devices.",
+      "Choosing the right AI chatbot can be confusing. This article explains how chatbots automate lead capture, qualification, and follow-ups to significantly improve conversions.",
     source_url:
-      "https://beyondchats.com/blogs/live-chatbot/",
+      "https://beyondchats.com/blogs/lead-generation-chatbots/",
     is_updated: false,
   },
   {
     id: "demo-5",
-    title: "Chatbots Magic: Beginner’s Guidebook",
+    title: "Can Chatbots Boost Small Business Growth?",
     content:
-      "This beginner-friendly guide introduces how chatbots work, where they add value, and how businesses can start small. It represents the oldest scraped content in the assignment context.",
+      "Small businesses often struggle with limited resources. This article explores how chatbots help automate support, capture leads, and scale customer engagement efficiently.",
     source_url:
-      "https://beyondchats.com/blogs/",
+      "https://beyondchats.com/blogs/chatbots-for-small-business-growth/",
     is_updated: false,
   },
+  
 ];
+
